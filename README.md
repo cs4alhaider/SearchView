@@ -1,7 +1,7 @@
 # Searchable SwiftUI View
 
 ### Prove of concept on how to natively implement SearchView using SwiftUI API's
----
+
 
 | Example Countery search app |
 | --- |
@@ -31,11 +31,9 @@ var body: some View {
 
 ## Installation
 
-### Drag and drop 
+#### Drag and drop 
 
 Just take `Searchable View` folder into your project
-
----
 
 ## Author
 This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Telegram channel. code written by [cs4alhaider](https://twitter.com/cs4alhaider). 
