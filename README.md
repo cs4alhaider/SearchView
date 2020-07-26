@@ -9,10 +9,17 @@
 
 ---
 
-- [Usage](#usage)
 - [Installation](#installation)
+- [Usage](#usage)
 - [Author](#author)
 - [License](#license)
+
+
+## Installation
+
+> It requires iOS 13 and Xcode 11!
+
+In Xcode go to `File -> Swift Packages -> Add Package Dependency` and paste in the repo's url: `https://github.com/cs4alhaider/SearchView`
 
 
 ## Usage
@@ -33,15 +40,9 @@ var body: some View {
 
 ```
 
-## Installation
-
-> It requires iOS 13 and Xcode 11!
-
-In Xcode go to `File -> Swift Packages -> Add Package Dependency` and paste in the repo's url: `https://github.com/cs4alhaider/SearchView`
-
 
 ## Author
-This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Telegram channel. code written by [cs4alhaider](https://twitter.com/cs4alhaider). 
+This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Telegram channel.  
 
 ## License
 
