@@ -2,6 +2,8 @@
 
 ### SPM, Prove of concept on how to natively implement SearchView using SwiftUI API's
 
+This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Telegram channel.
+
 
 | Example Countery search app |
 | --- |
@@ -42,7 +44,7 @@ var body: some View {
 
 
 ## Author
-This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Telegram channel.  
+[Abdullah Alhaider](https://twitter.com/cs4alhaider), cs.alhaider@gmail.com
 
 ## License
 
