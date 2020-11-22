@@ -14,14 +14,12 @@ public struct SearchView<Content>: View where Content: View {
     
     @Binding var searchText: String
     let content: () -> Content
-    let onCancel: () -> Void?
     
     @State private var showCancelButton: Bool = false
     
-    public init(searchText: Binding<String>, onCancel: @escaping () -> Void? = {}, @ViewBuilder content: @escaping () -> Content) {
+    public init(searchText: Binding<String>, @ViewBuilder content: @escaping () -> Content) {
         self._searchText = searchText
         self.content = content
-        self.onCancel = onCancel
     }
     
     public var body: some View {
@@ -67,7 +65,6 @@ public struct SearchView<Content>: View where Content: View {
         UIApplication.endEditing(true) // this must be placed before the other commands here
         searchText = ""
         showCancelButton = false
-        onCancel()
     }
 }
 
