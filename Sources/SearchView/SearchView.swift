@@ -49,7 +49,6 @@ public struct SearchView<Content>: View where Content: View {
                 
                 if showCancelButton  {
                     Button("Cancel", action: cancel)
-                        .foregroundColor(Color(.systemBlue))
                 }
             }
             .padding(showCancelButton ? [.top, .leading, .trailing] : .horizontal)
