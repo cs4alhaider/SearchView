@@ -8,6 +8,6 @@
 import Foundation
 
 /// Protocol for identifiable objects that can be represented as a string.
-protocol IdentifiableStringConvertible: Identifiable {
+public protocol IdentifiableStringConvertible: Identifiable {
     var idStringValue: String { get }
 }

@@ -17,7 +17,7 @@ This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Tele
 
 ## Installation
 
-> It requires iOS 13 and Xcode 11!
+> It requires iOS 17 and Xcode 15!
 
 In Xcode go to `File -> Swift Packages -> Add Package Dependency` and paste in the repo's url: `https://github.com/cs4alhaider/SearchView`
 
