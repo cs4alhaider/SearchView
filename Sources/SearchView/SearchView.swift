@@ -14,7 +14,7 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Has
     /// State to track if the search bar is focused.
     @State private var isSearchBarFocused = false
     /// State to hold the IDs of recent searches, loaded from UserDefaults.
-    @State private var recentSearchIDs: [String] = UserDefaults.standard.stringArray(forKey: "RecentSearches") ?? []
+    @State private var recentSearchIDs: [String] = []
     /// Data list to be searched.
     let dataList: [DataSource]
     /// KeyPaths of the data list items that can be searched.
@@ -23,6 +23,8 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Has
     let content: (DataSource, String) -> Content
     /// Configuration for customizing text elements in the view.
     let configuration: SearchViewConfiguration
+    /// Key to store the recent searches
+    private let storeId: String
     
     /// Initializes a new search view with the provided parameters.
     public init(
@@ -36,6 +38,9 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Has
         self._searchQuery = searchQuery
         self.content = content
         self.configuration = configuration
+        self.storeId = "RecentSearches_" + String(describing: DataSource.self)
+        self.recentSearchIDs = UserDefaults.standard.stringArray(forKey: storeId) ?? []
+        print(storeId)
     }
     
     public var body: some View {
@@ -143,12 +148,12 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Has
         if recentSearchIDs.count > configuration.recentSavedSearchesCount {
             recentSearchIDs.removeLast()
         }
-        UserDefaults.standard.set(recentSearchIDs, forKey: "RecentSearches")
+        UserDefaults.standard.set(recentSearchIDs, forKey: storeId)
     }
     
     /// Loads the IDs of recent searches from UserDefaults.
     private func loadRecentSearchIDs() {
-        recentSearchIDs = UserDefaults.standard.stringArray(forKey: "RecentSearches") ?? []
+        recentSearchIDs = UserDefaults.standard.stringArray(forKey: storeId) ?? []
     }
     
     /// Clears all recent search IDs from UserDefaults.
@@ -156,6 +161,6 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Has
         withAnimation {
             recentSearchIDs.removeAll()
         }
-        UserDefaults.standard.set(recentSearchIDs, forKey: "RecentSearches")
+        UserDefaults.standard.set(recentSearchIDs, forKey: storeId)
     }
 }
