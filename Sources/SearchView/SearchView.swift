@@ -8,7 +8,7 @@
 import SwiftUI
 
 /// Generic search view for displaying search results and handling recent searches.
-public struct SearchView<DataSource, Content, Value>: View where DataSource: Hashable & IdentifiableStringConvertible, Content: View, Value: Hashable {
+public struct SearchView<DataSource, Content, Value>: View where DataSource: Searchable, Content: View, Value: Hashable {
     /// Binding to the current search query input by the user.
     @Binding var searchQuery: String
     /// State to track if the search bar is focused.
@@ -108,9 +108,9 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Has
         List {
             ForEach(filteredDataList()) { item in
                 content(item, searchQuery)
-                    .onTapGesture {
+                    .onSaveRecentSearch(item: item) { selectedItem in
                         if isSearchBarFocused {
-                            saveRecentSearch(item: item)
+                            saveRecentSearch(item: selectedItem)
                         }
                     }
             }
@@ -164,3 +164,4 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Has
         UserDefaults.standard.set(recentSearchIDs, forKey: storeId)
     }
 }
+
