@@ -11,6 +11,8 @@ import SwiftUI
 public struct SearchView<DataSource, Content, Value>: View where DataSource: Searchable, Content: View, Value: Hashable {
     /// Binding to the current search query input by the user.
     @Binding var searchQuery: String
+    
+    @State private var selection: DataSource?
     /// State to track if the search bar is focused.
     @State private var isSearchBarFocused = false
     /// State to hold the IDs of recent searches, loaded from UserDefaults.
@@ -32,7 +34,8 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Sea
         searchableKeyPaths: [KeyPath<DataSource, Value>],
         searchQuery: Binding<String>,
         configuration: SearchViewConfiguration = SearchViewConfiguration(),
-        @ViewBuilder content: @escaping (DataSource, String) -> Content) {
+        @ViewBuilder content: @escaping (DataSource, String) -> Content
+    ) {
         self.dataList = dataList
         self.searchableKeyPaths = searchableKeyPaths
         self._searchQuery = searchQuery
@@ -59,6 +62,11 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Sea
             }
         }
         .searchable(text: $searchQuery, isPresented: $isSearchBarFocused, prompt: configuration.searchPrompt)
+        .onChange(of: selection) { oldValue, newValue in
+            if let newValue, isSearchBarFocused {
+                saveRecentSearch(item: newValue)
+            }
+        }
         .onAppear {
             loadRecentSearchIDs()
         }
@@ -87,11 +95,9 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Sea
     
     /// View displaying the list of recent searches.
     private var recentSearchesView: some View {
-        List {
+        List(recentItems(), selection: $selection) { item in
             Section {
-                ForEach(recentItems()) { item in
-                    content(item, "")
-                }
+                content(item, "")
             } header: {
                 HStack {
                     Text(configuration.recentSearchesHeaderText)
@@ -105,15 +111,8 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Sea
     
     /// View displaying the search results based on the current query.
     private var searchResultsView: some View {
-        List {
-            ForEach(filteredDataList()) { item in
-                content(item, searchQuery)
-                    .onSaveRecentSearch(item: item) { selectedItem in
-                        if isSearchBarFocused {
-                            saveRecentSearch(item: selectedItem)
-                        }
-                    }
-            }
+        List(filteredDataList(), selection: $selection) { item in
+            content(item, searchQuery)
         }
     }
     
