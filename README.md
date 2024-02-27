@@ -55,11 +55,6 @@ To initialize `SearchView`, you'll need:
 Define your data model and conform to `Searchable`.
 
 ```swift
-struct MyDataItem: Searchable {
-    var id: UUID
-    var name: String
-}
-
 struct Fruit: Searchable {
     var id: UUID = UUID()
     var name: String
@@ -69,17 +64,9 @@ struct Fruit: Searchable {
         id.uuidString
     }
 }
-```
-
-Create example arrays to use in the demo:
-
-```swift
-let dataList = [
-    MyDataItem(id: UUID(), name: "Item 1"),
-    MyDataItem(id: UUID(), name: "Item 2"),
-]
 
 extension Fruit {
+    // Sample data
     static var example: [Fruit] {
         [
             Fruit(name: "Apple", description: "Green and red."),
@@ -90,6 +77,12 @@ extension Fruit {
 }
 ```
 
+Create example arrays to use in the demo:
+
+```swift
+let dataList: [Fruit] = Fruit.example
+```
+
 Implement `SearchView` in your SwiftUI view:
 
 ```swift
@@ -97,13 +90,8 @@ Implement `SearchView` in your SwiftUI view:
 
 var body: some View {
     NavigationStack {
-        SearchView(items: dataList,
-                   searchableProperties: [\MyDataItem.name],
-                   searchQuery: $searchQuery) { item, query in
-            Text(item.name)
-        }
         SearchView(
-            items: Fruit.example,
+            items: dataList,
             searchableProperties: [\.name, \.description],
             searchQuery: $searchQuery
         ) { fruit, searchTerm in
