@@ -1,38 +1,65 @@
-# Searchable SwiftUI View
+# Generic Searchable SwiftUI View
 
-### SPM, Prove of concept on how to natively implement SearchView using SwiftUI API's
+### SearchView
 
-This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Telegram channel.
+This proof of concept demonstrates how to natively implement a generic `SearchView` using Swift & SwiftUI APIs. The project was initiated in response to a request from the [Swift() Telegram Group](https://t.me/SwiftGroup).
 
-## Example projects 
-Here you can see in details two examples on how to use `SearchView`, go to [this repo](https://github.com/cs4alhaider/SearchViewExamples)
+### Example Projects
+
+[Explore detailed examples here](https://github.com/cs4alhaider/SearchViewExamples) on using `SearchView` in these sample applications:
 
 | Example Country search app | Example Frutes search app |
 | -------------------------- | ------------------------- |
 | ![](Assets/CountryApp.gif) | ![](Assets/FruitsApp.gif) |
 
 ---
+## Understanding `SearchView`: An In-Depth Guide
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [Author](#author)
-- [License](#license)
+The `SearchView` struct in Swift offers a versatile and customizable search interface for SwiftUI applications. This guide explores its components, functionality, and how to effectively integrate it into your projects.
 
-## Installation
+### Core Concepts
 
-> It requires iOS 17 and Xcode 15!
+#### Generic Structure
+`SearchView` is designed with a generic structure to offer flexibility, defined by:
+- `Item`: A data model conforming to `Searchable`, which includes identifiable and hashable objects.
+- `Content`: The view type for displaying each item in the search results.
+- `Value`: The type of searchable properties within `Item`, which must be hashable.
 
-In Xcode go to `File -> Swift Packages -> Add Package Dependency` and paste in the repo's url: `https://github.com/cs4alhaider/SearchView` and use `master` branch
+#### Main Features
+- **Dynamic Search**: Dynamically updates the display based on user input and searchable properties.
+- **Recent Searches**: Manages and displays recent searches using `UserDefaults`.
+- **Customizable UI**: Offers customization of text elements through `SearchViewConfiguration`.
 
-## Usage
+### How It Works
+
+#### Initialization
+To initialize `SearchView`, you'll need:
+- An array of `Item` objects to search through.
+- KeyPaths to the searchable properties within `Item`.
+- A binding to a `String` that represents the current search query.
+- A closure (`content`) defining the display of each `Item`.
+
+#### Search Functionality
+- Filters items based on the search query and specified searchable properties.
+- Provides real-time display updates as the user types.
+
+#### Recent Searches
+- Saves recent searches to `UserDefaults` and displays them when the search field is focused but empty.
+- Includes functionality to clear recent searches easily.
+
+#### Customization
+- `SearchViewConfiguration` allows for the customization of prompts, empty and no-result state messages, and more for a tailored user experience.
+
+### Usage Example
+
+Define your data model and conform to `Searchable`.
 
 ```swift
-import SearchView
-```
+struct MyDataItem: Searchable {
+    var id: UUID
+    var name: String
+}
 
-Define your data model and conform to `Searchable` like:
-
-```swift
 struct Fruit: Searchable {
     var id: UUID = UUID()
     var name: String
@@ -44,49 +71,60 @@ struct Fruit: Searchable {
 }
 ```
 
-For this demo purpose, will create `[Fruit]` example to play around:
+Create example arrays to use in the demo:
 
 ```swift
+let dataList = [
+    MyDataItem(id: UUID(), name: "Item 1"),
+    MyDataItem(id: UUID(), name: "Item 2"),
+]
+
 extension Fruit {
-    public static var example: [Fruit] {
+    static var example: [Fruit] {
         [
             Fruit(name: "Apple", description: "Green and red."),
             Fruit(name: "Banana", description: "Long and yellow."),
-            ...
+            // Add more fruits...
         ]
     }
 }
 ```
 
-And then add it and everything should work:
+Implement `SearchView` in your SwiftUI view:
 
 ```swift
-struct ContentView: View {
-    @State private var searchQuery = ""
-    let fruits: [Fruit] = Fruit.example
+@State private var searchQuery: String = ""
 
-    var body: some View {
-        NavigationStack {
-            SearchView(
-                items: fruits,
-                searchableProperties: [\.name, \.description],
-                searchQuery: $searchQuery
-            ) { fruit, searchTerm in
-                VStack(alignment: .leading) {
-                    Text(fruit.name)
-                        .bold()
-                        .foregroundColor(.blue)
-                    Text(fruit.description)
-                        .font(.subheadline)
-                }
-                .padding(.vertical, 4)
-            }
-            .navigationTitle("Fruits")
+var body: some View {
+    NavigationStack {
+        SearchView(items: dataList,
+                   searchableProperties: [\MyDataItem.name],
+                   searchQuery: $searchQuery) { item, query in
+            Text(item.name)
         }
+        SearchView(
+            items: Fruit.example,
+            searchableProperties: [\.name, \.description],
+            searchQuery: $searchQuery
+        ) { fruit, searchTerm in
+            VStack(alignment: .leading) {
+                Text(fruit.name).bold().foregroundColor(.blue)
+                Text(fruit.description).font(.subheadline)
+            }
+            .padding(.vertical, 4)
+        }
+        .navigationTitle("Searchable Items")
     }
 }
-
 ```
+
+## Installation
+
+Requires iOS 17 and Xcode 15 or later.
+
+1. In Xcode, navigate to `File -> Swift Packages -> Add Package Dependency`.
+2. Paste the repository URL: `https://github.com/cs4alhaider/SearchView`.
+3. Select the `master` branch or a specific version.
 
 ## Author
 
@@ -94,4 +132,4 @@ struct ContentView: View {
 
 ## License
 
-This project is under the MIT license. See the LICENSE file for more info.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
