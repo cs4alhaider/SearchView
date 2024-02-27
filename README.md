@@ -30,10 +30,10 @@ In Xcode go to `File -> Swift Packages -> Add Package Dependency` and paste in t
 import SearchView
 ```
 
-Define your data model and conform to both `IdentifiableStringConvertible` and `Hashable` like:
+Define your data model and conform to `Searchable` like:
 
 ```swift
-struct Fruit: IdentifiableStringConvertible, Hashable {
+struct Fruit: Searchable {
     var id: UUID = UUID()
     var name: String
     var description: String
@@ -100,8 +100,8 @@ struct ContentView: View {
     var body: some View {
         NavigationStack {
             SearchView(
-                dataList: fruits,
-                searchableKeyPaths: [\Fruit.name, \Fruit.description],
+                items: fruits,
+                searchableProperties: [\.name, \.description],
                 searchQuery: $searchQuery
             ) { fruit, searchTerm in
                 VStack(alignment: .leading) {
@@ -112,7 +112,6 @@ struct ContentView: View {
                         .font(.subheadline)
                 }
                 .padding(.vertical, 4)
-                .listRowSeparator(.hidden)
             }
             .navigationTitle("Fruits")
         }
