@@ -85,15 +85,24 @@ public struct SearchView<Item, Content, Value>: View where Item: Searchable, Con
     
     public var body: some View {
         VStack {
-            if isSearchBarFocused && searchQuery.isEmpty {
-                if recentSearchIDs.isEmpty {
-                    emptySearchView
+            // Determine view based on search bar focus and query conditions
+            if isSearchBarFocused {
+                // When search bar is focused but query is either empty or only whitespace
+                if searchQuery.isEmpty || searchQuery.allSatisfy({ $0.isWhitespace }) {
+                    // Show recent searches if available, otherwise show empty search view
+                    if recentSearchIDs.isEmpty {
+                        emptySearchView
+                    } else {
+                        recentSearchesView
+                    }
+                    // When search bar is focused and the filtered data list is empty
+                } else if filteredDataList().isEmpty {
+                    noResultsView
+                    // Default to showing search results
                 } else {
-                    recentSearchesView
+                    searchResultsView
                 }
-            } else if isSearchBarFocused && filteredDataList().isEmpty {
-                // New view for when there are no results for the current search query.
-                noResultsView
+                // Show search results when search bar is not focused
             } else {
                 searchResultsView
             }
@@ -149,11 +158,13 @@ public struct SearchView<Item, Content, Value>: View where Item: Searchable, Con
             Section {
                 ForEach(filteredDataList()) { item in
                     content(item, searchQuery)
-                        .onSaveRecentSearch(item: item) { selectedItem in
-                            if isSearchBarFocused {
-                                saveRecentSearch(item: selectedItem)
-                            }
-                        }
+                    // https://www.hackingwithswift.com/quick-start/swiftui/how-to-make-two-gestures-recognize-at-the-same-time-using-simultaneousgesture
+                        .simultaneousGesture(
+                            TapGesture()
+                                .onEnded { _ in
+                                    saveRecentSearch(item: item)
+                                }
+                        )
                 }
             } header: {
                 if isSearchBarFocused && !searchQuery.isEmpty {
