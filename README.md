@@ -26,9 +26,13 @@ The `SearchView` struct in Swift offers a versatile and customizable search inte
 - `Value`: The type of searchable properties within `Item`, which must be hashable.
 
 #### Main Features
+- **Searchable Properties**: Pass your properties using KeyPaths to enable them to be searchable.
 - **Dynamic Search**: Dynamically updates the display based on user input and searchable properties.
 - **Recent Searches**: Manages and displays recent searches using `UserDefaults`.
 - **Customizable UI**: Offers customization of text elements through `SearchViewConfiguration`.
+
+#### For The Future
+I might support [search tokens](https://developer.apple.com/documentation/swiftui/performing-a-search-operation) in a generic way as a keypath..
 
 ### How It Works
 
