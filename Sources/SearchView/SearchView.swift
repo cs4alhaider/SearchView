@@ -8,42 +8,79 @@
 import SwiftUI
 
 /// Generic search view for displaying search results and handling recent searches.
-public struct SearchView<DataSource, Content, Value>: View where DataSource: Searchable, Content: View, Value: Hashable {
+public struct SearchView<Item, Content, Value>: View where Item: Searchable, Content: View, Value: Hashable {
     /// Binding to the current search query input by the user.
     @Binding var searchQuery: String
-    
-    @State private var selection: DataSource?
     /// State to track if the search bar is focused.
     @State private var isSearchBarFocused = false
     /// State to hold the IDs of recent searches, loaded from UserDefaults.
     @State private var recentSearchIDs: [String] = []
     /// Data list to be searched.
-    let dataList: [DataSource]
+    let items: [Item]
     /// KeyPaths of the data list items that can be searched.
-    let searchableKeyPaths: [KeyPath<DataSource, Value>]
+    let searchableProperties: [KeyPath<Item, Value>]
     /// Closure that defines how to display each item in the search results.
-    let content: (DataSource, String) -> Content
+    let content: (Item, String) -> Content
     /// Configuration for customizing text elements in the view.
     let configuration: SearchViewConfiguration
     /// Key to store the recent searches
-    private let storeId: String
+    let storeId: String
     
     /// Initializes a new search view with the provided parameters.
+    /// - Parameters:
+    ///   - items: The array of data items that the search will be performed on.
+    ///   - searchableProperties: An array of key paths for the `Item` elements. These key paths
+    ///     indicate the properties of the data items that should be considered during the search.
+    ///   - searchQuery: A binding to the current search query input by the user. Changes to this value
+    ///     will trigger the search functionality.
+    ///   - configuration: Configuration for customizing text elements in the view. This allows for
+    ///     customization of various UI text elements like prompts, empty state messages, etc.
+    ///     Defaults to a standard configuration if not specified.
+    ///   - storeId: An optional string to specify the key under which recent searches will be stored
+    ///     in UserDefaults. If not provided, a default key is generated based on the `Item` type.
+    ///     This allows for separate recent search lists for different types of data.
+    ///   - content: A closure that defines how to display each item in the search results. This closure
+    ///     provides a way to customize the appearance and behavior of the list items.
+    ///
+    /// Example Usage:
+    /// ```
+    /// struct MyDataItem: Searchable {
+    ///     var id: UUID
+    ///     var name: String
+    /// }
+    ///
+    /// @State private var searchQuery: String = ""
+    ///
+    /// let dataList = [
+    ///     MyDataItem(id: UUID(), name: "Item 1"),
+    ///     MyDataItem(id: UUID(), name: "Item 2")
+    /// ]
+    ///
+    /// SearchView(items: dataList,
+    ///            searchableProperties: [\MyDataItem.name],
+    ///            searchQuery: $searchQuery
+    ///          ) { item, query in
+    ///     Text(item.name)
+    /// }
+    /// ```
+    /// This simple example creates a `SearchView` for a custom data type `MyDataItem` that searches
+    /// the name property of each item.
     public init(
-        dataList: [DataSource],
-        searchableKeyPaths: [KeyPath<DataSource, Value>],
+        items: [Item],
+        searchableProperties: [KeyPath<Item, Value>],
         searchQuery: Binding<String>,
         configuration: SearchViewConfiguration = SearchViewConfiguration(),
-        @ViewBuilder content: @escaping (DataSource, String) -> Content
+        storeId: String? = nil,
+        @ViewBuilder content: @escaping (Item, String) -> Content
     ) {
-        self.dataList = dataList
-        self.searchableKeyPaths = searchableKeyPaths
+        self.items = items
+        self.searchableProperties = searchableProperties
         self._searchQuery = searchQuery
         self.content = content
         self.configuration = configuration
-        self.storeId = "RecentSearches_" + String(describing: DataSource.self)
-        self.recentSearchIDs = UserDefaults.standard.stringArray(forKey: storeId) ?? []
-        print(storeId)
+        let sid: String = storeId == nil ? ("RecentSearches_" + String(describing: Item.self)) : storeId!
+        self.storeId = sid
+        self.recentSearchIDs = UserDefaults.standard.stringArray(forKey: sid) ?? []
     }
     
     public var body: some View {
@@ -62,11 +99,6 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Sea
             }
         }
         .searchable(text: $searchQuery, isPresented: $isSearchBarFocused, prompt: configuration.searchPrompt)
-        .onChange(of: selection) { oldValue, newValue in
-            if let newValue, isSearchBarFocused {
-                saveRecentSearch(item: newValue)
-            }
-        }
         .onAppear {
             loadRecentSearchIDs()
         }
@@ -95,9 +127,11 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Sea
     
     /// View displaying the list of recent searches.
     private var recentSearchesView: some View {
-        List(recentItems(), selection: $selection) { item in
+        List {
             Section {
-                content(item, "")
+                ForEach(recentItems()) { item in
+                    content(item, "")
+                }
             } header: {
                 HStack {
                     Text(configuration.recentSearchesHeaderText)
@@ -111,25 +145,40 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Sea
     
     /// View displaying the search results based on the current query.
     private var searchResultsView: some View {
-        List(filteredDataList(), selection: $selection) { item in
-            content(item, searchQuery)
+        List {
+            Section {
+                ForEach(filteredDataList()) { item in
+                    content(item, searchQuery)
+                        .onSaveRecentSearch(item: item) { selectedItem in
+                            if isSearchBarFocused {
+                                saveRecentSearch(item: selectedItem)
+                            }
+                        }
+                }
+            } header: {
+                if isSearchBarFocused && !searchQuery.isEmpty {
+                    let resultsCount = filteredDataList().count
+                    let headerText = String(format: configuration.foundResultsHeaderText, "\(resultsCount)")
+                    Text(headerText)
+                }
+            }
         }
     }
     
     /// Filters the dataList to find items that match the search query.
-    private func recentItems() -> [DataSource] {
-        dataList.filter { item in
+    private func recentItems() -> [Item] {
+        items.filter { item in
             recentSearchIDs.contains(item.idStringValue)
         }
     }
     
     /// Filters the dataList to find items that match the search query.
-    private func filteredDataList() -> [DataSource] {
+    private func filteredDataList() -> [Item] {
         if searchQuery.isEmpty {
-            return dataList
+            return items
         } else {
-            return dataList.filter { item in
-                searchableKeyPaths.contains { keyPath in
+            return items.filter { item in
+                searchableProperties.contains { keyPath in
                     let value = item[keyPath: keyPath]
                     return "\(value)".localizedCaseInsensitiveContains(searchQuery)
                 }
@@ -138,7 +187,7 @@ public struct SearchView<DataSource, Content, Value>: View where DataSource: Sea
     }
     
     /// Saves the ID of the recently tapped item to UserDefaults.
-    private func saveRecentSearch(item: DataSource) {
+    private func saveRecentSearch(item: Item) {
         let itemID = item.idStringValue
         if let index = recentSearchIDs.firstIndex(of: itemID) {
             recentSearchIDs.remove(at: index)

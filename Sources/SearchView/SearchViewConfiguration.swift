@@ -21,6 +21,8 @@ public struct SearchViewConfiguration {
     let searchPrompt: String
     /// Maximum number of recent searches to save and display.
     let recentSavedSearchesCount: Int
+    /// Text to display as a header when search results are found.
+    let foundResultsHeaderText: String
 
     /// Initializes a new `SearchViewConfiguration` with optional custom values.
     /// - Parameters:
@@ -31,12 +33,13 @@ public struct SearchViewConfiguration {
     ///   - searchPrompt: Prompt text for the search field. Defaults to "Search".
     ///   - recentSavedSearchesCount: Maximum number of recent searches to save and display. Defaults to 10.
     public init(
-        emptySearchText: String = "Start searching for items now!",
+        emptySearchText: String = "Start searching now!",
         recentSearchesHeaderText: String = "Recent Searches",
         clearButtonText: String = "Clear",
         noResultsText: String = "No results found.",
         searchPrompt: String = "Search",
-        recentSavedSearchesCount: Int = 10
+        recentSavedSearchesCount: Int = 10,
+        foundResultsHeaderText: String = "Found %@ results"
     ) {
         self.emptySearchText = emptySearchText
         self.recentSearchesHeaderText = recentSearchesHeaderText
@@ -44,5 +47,6 @@ public struct SearchViewConfiguration {
         self.noResultsText = noResultsText
         self.searchPrompt = searchPrompt
         self.recentSavedSearchesCount = recentSavedSearchesCount
+        self.foundResultsHeaderText = foundResultsHeaderText
     }
 }

@@ -6,7 +6,7 @@ This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Tele
 
 | Example Country search app | Example Frutes search app |
 | -------------------------- | ------------------------- |
-| ![](Assets/gif_image.gif)  | ![](Assets/FruitsApp.gif) |
+| ![](Assets/CountryApp.gif) | ![](Assets/FruitsApp.gif) |
 
 ---
 
