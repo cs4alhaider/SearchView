@@ -4,6 +4,9 @@
 
 This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Telegram channel.
 
+## Example projects 
+Here you can see in details two examples on how to use `SearchView`, go to [this repo](https://github.com/cs4alhaider/SearchViewExamples)
+
 | Example Country search app | Example Frutes search app |
 | -------------------------- | ------------------------- |
 | ![](Assets/CountryApp.gif) | ![](Assets/FruitsApp.gif) |
@@ -19,7 +22,7 @@ This POC was requested from [let groupe = Swift()](https://t.me/SwiftGroup) Tele
 
 > It requires iOS 17 and Xcode 15!
 
-In Xcode go to `File -> Swift Packages -> Add Package Dependency` and paste in the repo's url: `https://github.com/cs4alhaider/SearchView`
+In Xcode go to `File -> Swift Packages -> Add Package Dependency` and paste in the repo's url: `https://github.com/cs4alhaider/SearchView` and use `master` branch
 
 ## Usage
 
