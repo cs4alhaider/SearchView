@@ -162,7 +162,9 @@ public struct SearchView<Item, Content, Value>: View where Item: Searchable, Con
                         .simultaneousGesture(
                             TapGesture()
                                 .onEnded { _ in
-                                    saveRecentSearch(item: item)
+                                    if isSearchBarFocused && !searchQuery.isEmpty {
+                                        saveRecentSearch(item: item)
+                                    }
                                 }
                         )
                 }
